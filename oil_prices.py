@@ -11,8 +11,10 @@ def _():
     import fedfred as fd
     import yfinance as yf
     import plotly.express as px
+    from dotenv import load_dotenv
+    import os
 
-    return fd, mo, px
+    return fd, load_dotenv, mo, os, px
 
 
 @app.cell
@@ -24,13 +26,10 @@ def _(mo):
 
 
 @app.cell
-def _():
-    api_key = 'xxxxxx' # Add your own API key
-    return (api_key,)
+def _(fd, load_dotenv, os):
+    load_dotenv()
+    api_key = os.getenv("FEDFRED_API_KEY")
 
-
-@app.cell
-def _(api_key, fd):
     fred = fd.FredAPI(api_key)
     return (fred,)
 
@@ -91,7 +90,7 @@ def _(oil_df):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     2. Plot oil prices over time. Are oil prices currently at an all-time high? (If not, then when were they?)
