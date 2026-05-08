@@ -221,12 +221,27 @@ def _(inf_oil):
 
 
 @app.cell
-def _(inf_oil):
+def _(inf_oil, px):
     (
         inf_oil
+        .dropna()
         .sort_index()
-        .pipe()
+        .pipe(lambda df_: px.scatter(
+                df_,
+                x="inflation",
+                y=["wti", "brent"],
+                trendline="ols",
+                title="Oil Prices vs Inflation",
+            ))
     )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Yes, there does appear to be a positive correlation based on the positive slope of both trendlines fit to the WTI and Brent data. This relationship suggests that when inflation goes up, oil prices go up.
+    """)
     return
 
 
