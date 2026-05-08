@@ -245,5 +245,29 @@ def _(mo):
     return
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    5. How about natural gas prices? Are they correlated with oil prices? with inflation levels?
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    6. Using the "yfinance" package, retrieve the closing future price for 1,000 barrels of oil to be delivered in July 2026. That'll be the CLN26.NYM data set from Yahoo. Start with January 1st, 2024. Create a line plot from this data. Can you describe how things changed when the war began at the end of February?
+    """)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    7. Plot the spot prices of WTI and the futures prices for July 2026 for all days in which you have data for both. How do you interpret this graph? Does this show that the market expects the blockade to end, and for more oil to be available later? Or that it will continue, and oil will be scarcer in July 2026?
+    """)
+    return
+
+
 if __name__ == "__main__":
     app.run()
