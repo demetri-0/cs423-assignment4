@@ -151,6 +151,16 @@ def _(oil_df, px):
     return
 
 
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## WTI vs. Brent
+
+    Based on the scatterplot and line chart, the prices of oil from the two datasets are very similar from 2000 to 2010. From that year on, the Brent price is consistently higher by a slight amount. There is a visible gap between the two prices when looking at the line chart, and the scatterplot helps confirm this observation.
+    """)
+    return
+
+
 @app.cell
 def _(mo):
     mo.md(r"""
