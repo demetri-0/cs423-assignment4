@@ -53,9 +53,21 @@ def _(fred):
 
 
 @app.cell
+def _(brent):
+    brent.head(3)
+    return
+
+
+@app.cell
 def _(fred):
     cpi = fred.get_series_observations('CPIAUCSL')
     return (cpi,)
+
+
+@app.cell
+def _(cpi):
+    cpi.head(3)
+    return
 
 
 @app.cell
@@ -71,22 +83,25 @@ def _(natural_gas):
 
 
 @app.cell
-def _(brent, wti):
-    # Combine series
+def _(brent, cpi, natural_gas, wti):
+    wti_df = wti[["value"]].rename(columns={"value": "wti"})
+    brent_df = brent[["value"]].rename(columns={"value": "brent"})
+    cpi_df = cpi[["value"]].rename(columns={"value": "cpi"})
+    gas_df = natural_gas[["value"]].rename(columns={"value": "natural_gas"})
 
     oil_df = (
-        wti
-        .join(brent, how='left', lsuffix='_wti', rsuffix='_brent')
-        .drop(['realtime_start_wti', 'realtime_end_wti', 'realtime_start_brent', 'realtime_end_brent'], axis='columns')
-
-
+        wti_df
+        .join(brent_df, how="inner")
+        .join(cpi_df, how="inner")
+        .join(gas_df, how="inner")
+        .dropna()
     )
     return (oil_df,)
 
 
 @app.cell
 def _(oil_df):
-    oil_df.sample(4)
+    oil_df.sample(15)
     return
 
 
@@ -103,7 +118,7 @@ def _(oil_df, px):
     (
         oil_df
         .sort_index()
-        .pipe(lambda df_: px.line(df_, x=df_.index, y=['value_wti', 'value_brent']))
+        .pipe(lambda df_: px.line(df_, x=df_.index, y=['wti', 'brent']))
     )
     return
 
@@ -113,7 +128,7 @@ def _(mo):
     mo.md(r"""
     ## Oil Prices Levels:
 
-    Right now oil prices are the second highest that they have been in recent history. Brent is touching $138/barrel which is lower than the highest ever which was July 2008 at $145/barrel
+    According to the plot, oil prices are about \$62 per barrel most recently as of Dec 2025, which is not the all time high. Oil prices were highest in Jul 2008 at ~\$140 per barrel.
     """)
     return
 
@@ -131,7 +146,7 @@ def _(oil_df, px):
     (
         oil_df
         .sort_index()
-        .pipe(lambda df_: px.scatter(df_, x='value_wti', y='value_brent', trendline='ols'))
+        .pipe(lambda df_: px.scatter(df_, x='wti', y='brent', trendline='ols'))
     )
     return
 
@@ -139,7 +154,7 @@ def _(oil_df, px):
 @app.cell
 def _(mo):
     mo.md(r"""
-    4. 4. Now plot oil prices against inflation. Is there a correlation? If yes, what is explanation for the relationship between oil prices and inflation?
+    4. Now plot oil prices against inflation. Is there a correlation? If yes, what is explanation for the relationship between oil prices and inflation?
     """)
     return
 
