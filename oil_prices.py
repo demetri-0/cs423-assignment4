@@ -253,6 +253,49 @@ def _(mo):
     return
 
 
+@app.cell
+def _(inf_oil, px):
+    (
+        inf_oil
+        .dropna()
+        .sort_index()
+        .pipe(lambda df_: px.scatter(
+                df_,
+                x="natural_gas",
+                y=["wti", "brent"],
+                trendline="ols",
+                title="Oil Prices vs Natural Gas Prices"
+            ))
+    )
+    return
+
+
+@app.cell
+def _(inf_oil, px):
+    (
+        inf_oil
+        .dropna()
+        .pipe(
+            lambda df_: px.scatter(
+                df_,
+                x="inflation",
+                y="natural_gas",
+                trendline="ols",
+                title="Natural Gas Prices vs Inflation"
+            )
+        )
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    There is a positive correlation between natural gas prices and oil prices as well as inflation and natural gas prices. This means that as inflation goes up, natural gas prices go up, and as oil prices go up, natural gas prices go up.
+    """)
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
