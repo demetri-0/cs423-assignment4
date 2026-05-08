@@ -7,17 +7,16 @@ app = marimo.App(width="medium")
 @app.cell
 def _():
     import marimo as mo
-    import pandas as pd
     import fedfred as fd
     import yfinance as yf
     import plotly.express as px
     from dotenv import load_dotenv
     import os
 
-    return fd, load_dotenv, mo, os, px
+    return fd, load_dotenv, mo, os, px, yf
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     1. Use the fedfred package from PyPI to download the daily spot oil prices from FRED for West Texas Intermediate (WTI) and Brent oil. These are known as the DCOILWTICO and DCOILBRENTEU data sets. Also download data on the Consumer Price Index (CPI) and daily natural gas prices. These are the series: CPIAUCSL and DHHNGSP. Only keep rows for which there's data on all four series. Join all four series into a  single data frame.
@@ -123,7 +122,7 @@ def _(oil_df, px):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     ## Oil Prices Levels:
@@ -133,7 +132,7 @@ def _(mo):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     3.  Is one price (WTI vs. Brent) consistently higher than the other in all data? Since 2000? Since 2010? Create a line plot showing both spot prices over time. Also show a scatterplot, with a trend line, showing the correlation between the two measures. How do you explain this correlation?
@@ -161,7 +160,7 @@ def _(mo):
     return
 
 
-@app.cell
+@app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     4. Now plot oil prices against inflation. Is there a correlation? If yes, what is explanation for the relationship between oil prices and inflation?
@@ -304,10 +303,88 @@ def _(mo):
     return
 
 
+@app.cell
+def _(yf):
+    futures = yf.download("CLN26.NYM", start="2024-01-01")
+    return (futures,)
+
+
+@app.cell
+def _(futures):
+    futures.head(3)
+    return
+
+
+@app.cell
+def _(futures):
+    futures.columns
+    return
+
+
+@app.cell
+def _(futures, px):
+    (
+        futures["Close"]
+        .reset_index()
+        .pipe(lambda df_: px.line(df_, x="Date", y="CLN26.NYM", title="July 2026 Oil Futures Price"))
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Prior to February 2026, oil future prices were steady with a slight downward trend. Immediately after the start of the war in February 2026, prices shot up immensely.
+    """)
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(r"""
     7. Plot the spot prices of WTI and the futures prices for July 2026 for all days in which you have data for both. How do you interpret this graph? Does this show that the market expects the blockade to end, and for more oil to be available later? Or that it will continue, and oil will be scarcer in July 2026?
+    """)
+    return
+
+
+@app.cell
+def _(futures, wti):
+    futures_df = futures["Close"].rename(columns={"CLN26.NYM": "future_close"})
+
+    wti_futures_df = (
+        wti[["value"]].rename(columns={"value": "wti"})
+        .join(futures_df, how="inner")
+    )
+    return (wti_futures_df,)
+
+
+@app.cell
+def _(wti_futures_df):
+    wti_futures_df.head(5)
+    return
+
+
+@app.cell
+def _(px, wti_futures_df):
+    (
+        wti_futures_df
+        .sort_index()
+        .pipe(
+            lambda df_: px.line(
+                df_,
+                x=df_.index,
+                y=["wti", "future_close"],
+                title="WTI Spot Prices vs July 2026 Oil Futures Prices",
+            )
+        )
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    By observing the graph, future close prices are lower than the WTI oil prices following the start of the February 2026 war. This suggests that oil prices are likely to go down by July 2026. It is unclear whether or not the blockade will fully end, but the availability of affordable oil is likely to increase.
     """)
     return
 
